@@ -4,6 +4,7 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 
 enum class Language(val key: String) {
+    SPAMMING_DESCRIPTION("auto_clicker.hud.spamming_desc"),
     DISABLE_ON_DEATH("auto_clicker.hud.disable_on_death"),
     ACTIVE_BUTTON("auto_clicker.hud.active_btn"),
     ACTIVE("auto_clicker.hud.active"),

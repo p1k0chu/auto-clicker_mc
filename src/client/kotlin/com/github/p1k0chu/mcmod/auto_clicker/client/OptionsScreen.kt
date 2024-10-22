@@ -1,6 +1,7 @@
 package com.github.p1k0chu.mcmod.auto_clicker.client
 
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.Element
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextFieldWidget
@@ -8,6 +9,8 @@ import net.minecraft.text.Text
 import net.minecraft.util.Colors
 
 class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker Settings")) {
+    private val tooltipsMap = mutableMapOf<Element, Text>()
+
     protected override fun init() {
         val w = textRenderer.getWidth(Language.LEFT_MOUSE_BUTTON.text) + 20
 
@@ -24,7 +27,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
                 .build()
         )
         // spamming toggle
-        this.addDrawableChild(
+        tooltipsMap.put(this.addDrawableChild(
             ButtonWidget.Builder(Language.SPAMMING.getText(AutoClicker.config.leftMouse.spamming)) { btn: ButtonWidget ->
                 AutoClicker.config.leftMouse.spamming = !AutoClicker.config.leftMouse.spamming
                 btn.message = Language.SPAMMING.getText(AutoClicker.config.leftMouse.spamming)
@@ -33,7 +36,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             }
                 .dimensions((width / 2 - w * 1.5).toInt(), height / 2 + 30, w, 30)
                 .build()
-        )
+        ), Language.SPAMMING_DESCRIPTION.text)
 
         // input field for left mouse button delay
         val leftDelayWidget = TextFieldWidget(
@@ -43,7 +46,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             Text.of(AutoClicker.config.leftMouse.cooldown.toString())
         )
         leftDelayWidget.text = AutoClicker.config.leftMouse.cooldown.toString()
-        this.addDrawableChild(leftDelayWidget)
+        tooltipsMap.put(this.addDrawableChild(leftDelayWidget), Language.COOLDOWN.text)
 
         leftDelayWidget.setChangedListener { value: String ->
             // trim leading zero
@@ -74,7 +77,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
                 .build()
         )
         // spamming toggle
-        this.addDrawableChild(
+        tooltipsMap.put(this.addDrawableChild(
             ButtonWidget.Builder(Language.SPAMMING.getText(AutoClicker.config.rightMouse.spamming)) { btn: ButtonWidget ->
                 AutoClicker.config.rightMouse.spamming = !AutoClicker.config.rightMouse.spamming
                 btn.message = Language.SPAMMING.getText(AutoClicker.config.rightMouse.spamming)
@@ -83,7 +86,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             }
                 .dimensions((width / 2 - w * 0.5).toInt(), height / 2 + 30, w, 30)
                 .build()
-        )
+        ), Language.SPAMMING_DESCRIPTION.text)
 
         // input field for right mouse button delay
         val rightDelayWidget = TextFieldWidget(
@@ -93,7 +96,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             Text.of(AutoClicker.config.rightMouse.cooldown.toString())
         )
         rightDelayWidget.text = AutoClicker.config.rightMouse.cooldown.toString()
-        this.addDrawableChild(rightDelayWidget)
+        tooltipsMap.put(this.addDrawableChild(rightDelayWidget), Language.COOLDOWN.text)
 
         rightDelayWidget.setChangedListener { value: String ->
             // trim leading zero
@@ -124,7 +127,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
                 .build()
         )
         // spamming toggle
-        this.addDrawableChild(
+        tooltipsMap.put(this.addDrawableChild(
             ButtonWidget.Builder(Language.SPAMMING.getText(AutoClicker.config.jump.spamming)) { btn: ButtonWidget ->
                 AutoClicker.config.jump.spamming = !AutoClicker.config.jump.spamming
                 btn.message = Language.SPAMMING.getText(AutoClicker.config.jump.spamming)
@@ -133,9 +136,9 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             }
                 .dimensions((width / 2 + w * 0.5).toInt(), height / 2 + 30, w, 30)
                 .build()
-        )
+        ), Language.SPAMMING_DESCRIPTION.text)
 
-        // input field for right mouse button delay
+        // input field for jumping delay
         val jumpDelayWidget = TextFieldWidget(
             textRenderer,
             (width / 2 + w * 0.5).toInt(), height / 2 + 60,
@@ -143,7 +146,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             Text.of(AutoClicker.config.jump.cooldown.toString())
         )
         jumpDelayWidget.text = AutoClicker.config.jump.cooldown.toString()
-        this.addDrawableChild(jumpDelayWidget)
+        tooltipsMap.put(this.addDrawableChild(jumpDelayWidget), Language.COOLDOWN.text)
 
         jumpDelayWidget.setChangedListener { value: String ->
             // trim leading zero
@@ -205,5 +208,12 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             width/2 + w, height / 2 - 20,
             Colors.WHITE,
         )
+
+        // draw tooltips
+        tooltipsMap.forEach { (widget, text) ->
+            if(widget.isMouseOver(mouseX.toDouble(), mouseY.toDouble())) {
+                context?.drawTooltip(textRenderer, text, mouseX, mouseY)
+            }
+        }
     }
 }
