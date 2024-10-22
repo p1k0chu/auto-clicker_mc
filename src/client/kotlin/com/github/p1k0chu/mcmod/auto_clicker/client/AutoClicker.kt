@@ -150,105 +150,96 @@ object AutoClicker : ClientModInitializer {
 
                     val trace: HitResult? = client?.crosshairTarget
 
-                    when (trace?.type) {
-                        HitResult.Type.ENTITY -> {
-                            // smart cast
-                            trace as EntityHitResult
+                    if (trace?.type == HitResult.Type.ENTITY) {
+                        trace as EntityHitResult
 
-                            when (holding) {
-                                // attack entity
-                                holdingLeft -> {
-                                    client?.interactionManager?.attackEntity(
-                                        client?.player,
-                                        trace.entity
-                                    )
-                                    // cosmetic
+                        when (holding) {
+                            // attack entity
+                            holdingLeft -> {
+                                client?.interactionManager?.attackEntity(
+                                    client?.player,
+                                    trace.entity
+                                )
+                                // cosmetic
+                                client?.player?.swingHand(Hand.MAIN_HAND)
+                                // stop using item when you attack entities
+                                client?.interactionManager?.stopUsingItem(client?.player)
+                            }
+                            // interact with entity
+                            holdingRight -> {
+                                val result = client?.interactionManager?.interactEntity(
+                                    client!!.player,
+                                    trace.entity,
+                                    Hand.MAIN_HAND
+                                )
+
+                                if (result?.shouldSwingHand() == true)
                                     client?.player?.swingHand(Hand.MAIN_HAND)
-                                    // stop using item when you attack entities
-                                    client?.interactionManager?.stopUsingItem(client?.player)
-                                }
-                                // interact with entity
-                                holdingRight -> {
-                                    val result = client?.interactionManager?.interactEntity(
+
+                                if (result?.isAccepted == false) {
+                                    // attempt again with offhand
+                                    val result1 = client?.interactionManager?.interactEntity(
                                         client!!.player,
                                         trace.entity,
-                                        Hand.MAIN_HAND
+                                        Hand.OFF_HAND
                                     )
 
-                                    if (result?.shouldSwingHand() == true)
-                                        client?.player?.swingHand(Hand.MAIN_HAND)
-
-                                    if (result?.isAccepted == false) {
-                                        // attempt again with offhand
-                                        val result1 = client?.interactionManager?.interactEntity(
-                                            client!!.player,
-                                            trace.entity,
-                                            Hand.OFF_HAND
-                                        )
-
-                                        if (result1?.shouldSwingHand() == true)
-                                            client?.player?.swingHand(Hand.OFF_HAND)
-                                    }
+                                    if (result1?.shouldSwingHand() == true)
+                                        client?.player?.swingHand(Hand.OFF_HAND)
                                 }
                             }
                         }
+                    } else if ((holding.config as? Config.AttackConfig)?.noBlocks != true && trace?.type == HitResult.Type.BLOCK) {
+                        trace as BlockHitResult
 
-                        HitResult.Type.BLOCK -> {
-                            trace as BlockHitResult
+                        when (holding.key) {
+                            // attack block (left click)
+                            client?.options?.attackKey -> {
+                                client?.interactionManager?.attackBlock(trace.blockPos, trace.side)
+                                // stop using item when you hit a block
+                                client?.interactionManager?.stopUsingItem(client?.player)
+                            }
+                            // interact with block (right click)
+                            client?.options?.useKey -> {
+                                val result = client?.interactionManager?.interactBlock(
+                                    client!!.player,
+                                    Hand.MAIN_HAND,
+                                    trace
+                                )
+                                if (result?.shouldSwingHand() == true)
+                                    client?.player?.swingHand(Hand.MAIN_HAND)
 
-                            when (holding.key) {
-                                // attack block (left click)
-                                client?.options?.attackKey -> {
-                                    client?.interactionManager?.attackBlock(trace.blockPos, trace.side)
-                                    // stop using item when you hit a block
-                                    client?.interactionManager?.stopUsingItem(client?.player)
-                                }
-                                // interact with block (right click)
-                                client?.options?.useKey -> {
-                                    val result = client?.interactionManager?.interactBlock(
+                                if (result?.isAccepted == false) {
+                                    // attempt again with offhand
+                                    val result1 = client?.interactionManager?.interactBlock(
                                         client!!.player,
-                                        Hand.MAIN_HAND,
+                                        Hand.OFF_HAND,
                                         trace
                                     )
-                                    if (result?.shouldSwingHand() == true)
-                                        client?.player?.swingHand(Hand.MAIN_HAND)
 
-                                    if (result?.isAccepted == false) {
-                                        // attempt again with offhand
-                                        val result1 = client?.interactionManager?.interactBlock(
-                                            client!!.player,
-                                            Hand.OFF_HAND,
-                                            trace
-                                        )
+                                    if (result1?.shouldSwingHand() == true)
+                                        client?.player?.swingHand(Hand.OFF_HAND)
 
-                                        if (result1?.shouldSwingHand() == true)
-                                            client?.player?.swingHand(Hand.OFF_HAND)
+                                    if (result1?.isAccepted == false) {
+                                        client?.run {
+                                            val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
 
-                                        if(result1?.isAccepted == false) {
-                                            client?.run {
-                                                val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
-
-                                                if(result2?.isAccepted == false) {
-                                                    interactionManager?.interactItem(player, Hand.OFF_HAND)
-                                                }
+                                            if (result2?.isAccepted == false) {
+                                                interactionManager?.interactItem(player, Hand.OFF_HAND)
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                    } else {
+                        if (holding == holdingRight) client?.run {
+                            val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
 
-                        HitResult.Type.MISS -> {
-                            if (holding == holdingRight) client?.run {
-                                val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
-
-                                if(result2?.isAccepted == false) {
-                                    interactionManager?.interactItem(player, Hand.OFF_HAND)
-                                }
+                            if (result2?.isAccepted == false) {
+                                interactionManager?.interactItem(player, Hand.OFF_HAND)
                             }
                         }
-
-                        null -> {}
                     }
                 }
             } else {
