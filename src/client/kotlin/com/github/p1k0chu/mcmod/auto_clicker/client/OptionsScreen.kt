@@ -160,6 +160,18 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
             AutoClicker.saveConfig()
         }
+
+        // disable on death toggle in the corner
+        addDrawableChild(ButtonWidget.Builder(Language.DISABLE_ON_DEATH.getText(AutoClicker.config.deactivateOnDeath)) { btn: ButtonWidget ->
+            // toggle the config
+            AutoClicker.config.deactivateOnDeath = !AutoClicker.config.deactivateOnDeath
+            // update the message
+            btn.message = Language.DISABLE_ON_DEATH.getText(AutoClicker.config.deactivateOnDeath)
+        }
+            .size(150, 20)
+            .position(0, height - 20)
+            .build()
+        )
     }
 
     override fun render(

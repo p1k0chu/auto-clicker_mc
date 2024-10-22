@@ -1,4 +1,5 @@
 {
+  "auto_clicker.hud.disable_on_death": "Disable on death: %s",
   "category.auto_clicker": "Auto Clicker keybindings",
   "auto_clicker.key.open-gui": "Open settings GUI",
   "auto_clicker.key.toggle-functionality": "Toggle enabled/disabled",
