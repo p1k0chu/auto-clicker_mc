@@ -23,7 +23,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
                 AutoClicker.saveConfig()
             }
-                .dimensions((width / 2 - w * 1.5).toInt(), height / 2, w, 30)
+                .dimensions((width / 2 - w * 1.5 - 10).toInt(), height / 2 - 50, w, 20)
                 .build()
         )
         // spamming toggle
@@ -34,15 +34,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
                 AutoClicker.saveConfig()
             }
-                .dimensions((width / 2 - w * 1.5).toInt(), height / 2 + 30, w, 30)
+                .dimensions((width / 2 - w * 1.5 - 10).toInt(), height / 2 - 29, w, 20)
                 .build()
         ), Language.SPAMMING_DESCRIPTION.text)
 
         // input field for left mouse button delay
         val leftDelayWidget = TextFieldWidget(
             textRenderer,
-            (width / 2 - w * 1.5).toInt(), height / 2 + 60,
-            w, 30,
+            (width / 2 - w * 1.5 - 10).toInt(), height / 2 - 8,
+            w, 20,
             Text.of(AutoClicker.config.leftMouse.cooldown.toString())
         )
         leftDelayWidget.text = AutoClicker.config.leftMouse.cooldown.toString()
@@ -73,7 +73,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
                 AutoClicker.saveConfig()
             }
-                .dimensions((width / 2 - w * 0.5).toInt(), height / 2, w, 30)
+                .dimensions((width / 2 - w * 0.5).toInt(), height / 2 - 50, w, 20)
                 .build()
         )
         // spamming toggle
@@ -84,15 +84,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
                 AutoClicker.saveConfig()
             }
-                .dimensions((width / 2 - w * 0.5).toInt(), height / 2 + 30, w, 30)
+                .dimensions((width / 2 - w * 0.5).toInt(), height / 2 - 29, w, 20)
                 .build()
         ), Language.SPAMMING_DESCRIPTION.text)
 
         // input field for right mouse button delay
         val rightDelayWidget = TextFieldWidget(
             textRenderer,
-            (width / 2 - w * 0.5).toInt(), height / 2 + 60,
-            w, 30,
+            (width / 2 - w * 0.5).toInt(), height / 2 - 8,
+            w, 20,
             Text.of(AutoClicker.config.rightMouse.cooldown.toString())
         )
         rightDelayWidget.text = AutoClicker.config.rightMouse.cooldown.toString()
@@ -123,7 +123,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
                 AutoClicker.saveConfig()
             }
-                .dimensions((width / 2 + w * 0.5).toInt(), height / 2, w, 30)
+                .dimensions((width / 2 + w * 0.5 + 10).toInt(), height / 2 - 50, w, 20)
                 .build()
         )
         // spamming toggle
@@ -134,15 +134,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
                 AutoClicker.saveConfig()
             }
-                .dimensions((width / 2 + w * 0.5).toInt(), height / 2 + 30, w, 30)
+                .dimensions((width / 2 + w * 0.5 + 10).toInt(), height / 2 - 29, w, 20)
                 .build()
         ), Language.SPAMMING_DESCRIPTION.text)
 
         // input field for jumping delay
         val jumpDelayWidget = TextFieldWidget(
             textRenderer,
-            (width / 2 + w * 0.5).toInt(), height / 2 + 60,
-            w, 30,
+            (width / 2 + w * 0.5 + 10).toInt(), height / 2 - 8,
+            w, 20,
             Text.of(AutoClicker.config.jump.cooldown.toString())
         )
         jumpDelayWidget.text = AutoClicker.config.jump.cooldown.toString()
@@ -172,7 +172,7 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             btn.message = Language.DISABLE_ON_DEATH.getText(AutoClicker.config.deactivateOnDeath)
         }
             .size(150, 20)
-            .position(0, height - 20)
+            .position(2, height - 22)
             .build()
         )
     }
@@ -191,21 +191,21 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
         context?.drawCenteredTextWithShadow(
             textRenderer,
             Language.LEFT_MOUSE_BUTTON.text,
-            width/2 - w, height / 2 - 20,
+            width/2 - w - 10, height / 2 - 60,
             Colors.WHITE,
         )
 
         context?.drawCenteredTextWithShadow(
             textRenderer,
             Language.RIGHT_MOUSE_BUTTON.text,
-            width/2, height / 2 - 20,
+            width/2, height / 2 - 60,
             Colors.WHITE,
         )
 
         context?.drawCenteredTextWithShadow(
             textRenderer,
             Language.JUMP.text,
-            width/2 + w, height / 2 - 20,
+            width/2 + w + 10, height / 2 - 60,
             Colors.WHITE,
         )
 
