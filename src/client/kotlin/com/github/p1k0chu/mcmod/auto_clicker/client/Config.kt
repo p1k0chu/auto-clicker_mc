@@ -16,6 +16,6 @@ class Config(
     open class SharedConfig(
         var cooldown: Int = 0,
         var active: Boolean = false,
-        var spamming: Boolean = false,
+        var spamming: Boolean = false
     )
 }
