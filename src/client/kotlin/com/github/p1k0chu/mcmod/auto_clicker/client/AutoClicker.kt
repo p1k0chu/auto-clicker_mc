@@ -43,8 +43,13 @@ object AutoClicker : ClientModInitializer {
     var active: Boolean = false
         private set(v) {
             field = v
-            // release all the buttons
-            if (!v) {
+            if (v) {
+                // reset all timeouts
+                holdingLeft.timeout = holdingLeft.config.cooldown
+                holdingRight.timeout = holdingRight.config.cooldown
+                holdingJump.timeout = holdingJump.config.cooldown
+            } else {
+                // release all the buttons
                 holdingLeft.key.isPressed = false
                 holdingRight.key.isPressed = false
                 holdingJump.key.isPressed = false
