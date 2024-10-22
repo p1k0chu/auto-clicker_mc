@@ -62,6 +62,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             AutoClicker.saveConfig()
         }
 
+        // ignore blocks toggle
+        tooltipsMap.put(this.addDrawableChild(ButtonWidget.Builder(Language.IGNORE_BLOCKS.getText(AutoClicker.config.leftMouse.ignoreBlocks)) { btn: ButtonWidget ->
+            AutoClicker.config.leftMouse.ignoreBlocks = !AutoClicker.config.leftMouse.ignoreBlocks
+            btn.message = Language.IGNORE_BLOCKS.getText(AutoClicker.config.leftMouse.ignoreBlocks)
+        }
+            .dimensions(width / 2 - 160, height / 2 + 14, 100, 20)
+            .build()
+        ), Language.IGNORE_BLOCKS_DESC.text)
+
         // right mouse button
         // active toggle
         this.addDrawableChild(
@@ -111,6 +120,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
 
             AutoClicker.saveConfig()
         }
+
+        // ignore blocks toggle
+        tooltipsMap.put(this.addDrawableChild(ButtonWidget.Builder(Language.IGNORE_BLOCKS.getText(AutoClicker.config.rightMouse.ignoreBlocks)) { btn: ButtonWidget ->
+            AutoClicker.config.rightMouse.ignoreBlocks = !AutoClicker.config.rightMouse.ignoreBlocks
+            btn.message = Language.IGNORE_BLOCKS.getText(AutoClicker.config.rightMouse.ignoreBlocks)
+        }
+            .dimensions(width / 2 - 50, height / 2 + 14, 100, 20)
+            .build()
+        ), Language.IGNORE_BLOCKS_DESC.text)
 
         // jumping
         // active toggle

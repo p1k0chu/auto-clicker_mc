@@ -1,8 +1,8 @@
 package com.github.p1k0chu.mcmod.auto_clicker.client
 
 class Config(
-    val leftMouse: SharedConfig = AttackConfig(),
-    val rightMouse: SharedConfig = AttackConfig(),
+    val leftMouse: AttackConfig = AttackConfig(),
+    val rightMouse: AttackConfig = AttackConfig(),
     val jump: SharedConfig = SharedConfig(),
     var deactivateOnDeath: Boolean = true
 ) {
@@ -10,7 +10,7 @@ class Config(
         cooldown: Int = 0,
         active: Boolean = false,
         spamming: Boolean = false,
-        var noBlocks: Boolean = false
+        var ignoreBlocks: Boolean = false
     ) : SharedConfig(cooldown, active, spamming)
 
     open class SharedConfig(

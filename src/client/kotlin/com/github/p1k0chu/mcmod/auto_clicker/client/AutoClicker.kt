@@ -189,7 +189,7 @@ object AutoClicker : ClientModInitializer {
                                 }
                             }
                         }
-                    } else if ((holding.config as? Config.AttackConfig)?.noBlocks != true && trace?.type == HitResult.Type.BLOCK) {
+                    } else if ((holding.config as? Config.AttackConfig)?.ignoreBlocks != true && trace?.type == HitResult.Type.BLOCK) {
                         trace as BlockHitResult
 
                         when (holding.key) {
