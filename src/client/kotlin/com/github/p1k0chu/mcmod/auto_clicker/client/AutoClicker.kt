@@ -124,6 +124,10 @@ object AutoClicker : ClientModInitializer {
     }
 
     private fun handleJumping(holding: Holding) {
+        if(holding != holdingJump) {
+            return
+        }
+
         if(holding.config.active) {
             if(holding.config.spamming) {
                 if (holding.timeout-- <= 1) {
@@ -145,6 +149,106 @@ object AutoClicker : ClientModInitializer {
         }
     }
 
+    private fun attemptMobAttack(trace: EntityHitResult, holding: Holding) {
+        if (holding != holdingLeft) {
+            return
+        }
+
+        client?.interactionManager?.attackEntity(
+            client?.player,
+            trace.entity
+        )
+        // cosmetic
+        client?.player?.swingHand(Hand.MAIN_HAND)
+
+        // stop using item when you attack entities
+        client?.interactionManager?.stopUsingItem(client?.player)
+
+        // reset the timeout
+        holding.timeout = holding.config.cooldown
+
+    }
+
+    private fun attemptMobInteract(trace: EntityHitResult, holding: Holding) {
+        if (holding != holdingRight) {
+            return
+        }
+
+        Hand.entries.forEach { hand: Hand ->
+            val result = client?.interactionManager?.interactEntity(
+                client!!.player,
+                trace.entity,
+                hand
+            )
+            if(result?.isAccepted == true) {
+                if (result.shouldSwingHand() == true)
+                    client?.player?.swingHand(Hand.OFF_HAND)
+
+                // reset the timeout
+                holding.timeout = holding.config.cooldown
+
+                return
+            }
+        }
+    }
+
+    private fun attemptBlockAttack(trace: BlockHitResult, holding: Holding) {
+        if(holding != holdingLeft) {
+            return
+        }
+
+        client?.interactionManager?.attackBlock(trace.blockPos, trace.side)
+        // stop using item when you hit a block
+        client?.interactionManager?.stopUsingItem(client?.player)
+        // reset the timeout
+        holding.timeout = holding.config.cooldown
+    }
+
+    private fun attemptBlockInteract(trace: BlockHitResult, holding: Holding) {
+        if(holding != holdingRight) {
+            return
+        }
+
+        Hand.entries.forEach { hand: Hand ->
+            val result = client?.interactionManager?.interactBlock(
+                client!!.player,
+                hand,
+                trace
+            )
+            if(result?.isAccepted == true) {
+                if (result.shouldSwingHand() == true) {
+                    client?.player?.swingHand(hand)
+                }
+                // reset the timeout
+                holding.timeout = holding.config.cooldown
+
+                return
+            }
+        }
+    }
+
+    private fun itemUse(holding: Holding) {
+        if(holding != holdingRight) {
+            return
+        }
+
+        Hand.entries.forEach { hand: Hand ->
+            val result = client?.interactionManager?.interactItem(client?.player, hand)
+
+            if (result?.isAccepted == true) {
+                if(result.shouldSwingHand()) {
+                    client?.player?.swingHand(hand)
+                }
+
+                holding.timeout = holding.config.cooldown
+
+                return
+            }
+        }
+
+
+    }
+
     // handler for attack and use
     private fun handleHolding(holding: Holding) {
         if (holding.config.active) {
@@ -152,120 +256,14 @@ object AutoClicker : ClientModInitializer {
                 if (holding.timeout-- <= 0) {
                     val trace: HitResult? = client?.crosshairTarget
 
-                    if (trace?.type == HitResult.Type.ENTITY) {
-                        trace as EntityHitResult
-
-                        when (holding) {
-                            // attack entity
-                            holdingLeft -> {
-                                client?.interactionManager?.attackEntity(
-                                    client?.player,
-                                    trace.entity
-                                )
-                                // cosmetic
-                                client?.player?.swingHand(Hand.MAIN_HAND)
-                                // stop using item when you attack entities
-                                client?.interactionManager?.stopUsingItem(client?.player)
-                                // reset the timeout
-                                holding.timeout = holding.config.cooldown
-                            }
-                            // interact with entity
-                            holdingRight -> {
-                                val result = client?.interactionManager?.interactEntity(
-                                    client!!.player,
-                                    trace.entity,
-                                    Hand.MAIN_HAND
-                                )
-
-                                if (result?.shouldSwingHand() == true)
-                                    client?.player?.swingHand(Hand.MAIN_HAND)
-
-                                if (result?.isAccepted == false) {
-                                    // attempt again with offhand
-                                    val result1 = client?.interactionManager?.interactEntity(
-                                        client!!.player,
-                                        trace.entity,
-                                        Hand.OFF_HAND
-                                    )
-                                    if(result1?.isAccepted == true) {
-                                        // reset the timeout
-                                        holding.timeout = holding.config.cooldown
-                                    }
-
-                                    if (result1?.shouldSwingHand() == true)
-                                        client?.player?.swingHand(Hand.OFF_HAND)
-                                } else if(result?.isAccepted == true) {
-                                    // reset the timeout
-                                    holding.timeout = holding.config.cooldown
-                                }
-                            }
-                        }
-                    } else if ((holding.config as? Config.AttackConfig)?.ignoreBlocks != true && trace?.type == HitResult.Type.BLOCK) {
-                        trace as BlockHitResult
-
-                        when (holding.key) {
-                            // attack block (left click)
-                            client?.options?.attackKey -> {
-                                client?.interactionManager?.attackBlock(trace.blockPos, trace.side)
-                                // stop using item when you hit a block
-                                client?.interactionManager?.stopUsingItem(client?.player)
-                                // reset the timeout
-                                holding.timeout = holding.config.cooldown
-                            }
-                            // interact with block (right click)
-                            client?.options?.useKey -> {
-                                val result = client?.interactionManager?.interactBlock(
-                                    client!!.player,
-                                    Hand.MAIN_HAND,
-                                    trace
-                                )
-                                if (result?.shouldSwingHand() == true)
-                                    client?.player?.swingHand(Hand.MAIN_HAND)
-
-                                if (result?.isAccepted == false) {
-                                    // attempt again with offhand
-                                    val result1 = client?.interactionManager?.interactBlock(
-                                        client!!.player,
-                                        Hand.OFF_HAND,
-                                        trace
-                                    )
-
-                                    if (result1?.shouldSwingHand() == true)
-                                        client?.player?.swingHand(Hand.OFF_HAND)
-
-                                    if (result1?.isAccepted == false) {
-                                        client?.run {
-                                            val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
-
-                                            if (result2?.isAccepted == false) {
-                                                interactionManager?.interactItem(player, Hand.OFF_HAND)
-                                            }
-                                        }
-                                    } else if (result1?.isAccepted == true) {
-                                        // reset the timeout
-                                        holding.timeout = holding.config.cooldown
-                                    }
-                                } else if (result?.isAccepted == true) {
-                                    // reset the timeout
-                                    holding.timeout = holding.config.cooldown
-                                }
-                            }
-                        }
-                    } else {
-                        if (holding == holdingRight) client?.run {
-                            val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
-
-                            if (result2?.isAccepted == false) {
-                                val result3 = interactionManager?.interactItem(player, Hand.OFF_HAND)
-                                if(result3?.isAccepted == true) {
-                                    // reset the timeout
-                                    holding.timeout = holding.config.cooldown
-                                }
-                            } else if (result2?.isAccepted == true) {
-                                // reset the timeout
-                                holding.timeout = holding.config.cooldown
-                            }
-                        }
+                    if(trace?.type == HitResult.Type.ENTITY) {
+                        attemptMobInteract(trace as EntityHitResult, holding)
+                        attemptMobAttack(trace, holding)
+                    } else if(trace?.type == HitResult.Type.BLOCK && (holding.config as? Config.AttackConfig)?.ignoreBlocks != true) {
+                        attemptBlockAttack(trace as BlockHitResult, holding)
+                        attemptBlockInteract(trace, holding)
+                    } else if (trace?.type == HitResult.Type.MISS) {
+                        itemUse(holding)
                     }
                 }
             } else {
