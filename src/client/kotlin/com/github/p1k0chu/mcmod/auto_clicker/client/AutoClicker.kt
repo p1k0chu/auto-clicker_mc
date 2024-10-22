@@ -63,10 +63,8 @@ object AutoClicker : ClientModInitializer {
         }
 
         HudRenderCallback.EVENT.register { context: DrawContext, tickCounter: RenderTickCounter? ->
-            val client: MinecraftClient = MinecraftClient.getInstance()!!
-
             if (active) {
-                context.drawText(client.textRenderer, Language.ACTIVE.text, 0, 0, Colors.WHITE, true)
+                context.drawText(client!!.textRenderer, Language.ACTIVE.text, 2, context.scaledWindowHeight - client!!.textRenderer.fontHeight - 2, Colors.WHITE, true)
             }
         }
 
