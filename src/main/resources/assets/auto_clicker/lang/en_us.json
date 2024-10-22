@@ -1,0 +1,12 @@
+{
+  "category.auto_clicker": "Auto Clicker keybindings",
+  "auto_clicker.key.open-gui": "Open settings GUI",
+  "auto_clicker.key.toggle-functionality": "Toggle enabled/disabled",
+  "auto_clicker.hud.delay": "Delay after every click",
+  "auto_clicker.hud.active": "Active!",
+  "auto_clicker.hud.active_btn": "Active: %s",
+  "auto_clicker.hud.left_mouse": "Left mouse button",
+  "auto_clicker.hud.right_mouse": "Right mouse button",
+  "auto_clicker.hud.jump_button": "Jump",
+  "auto_clicker.hud.spamming": "Spamming: %s"
+}

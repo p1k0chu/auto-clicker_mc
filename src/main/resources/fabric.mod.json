@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "auto_clicker",
+  "version": "${version}",
+  "name": "Auto Clicker",
+  "description": "Auto Clicker mod",
+  "authors": [
+    {
+      "name": "p1kachu",
+      "contact": {
+        "homepage": "https://bsky.app/profile/p1kachu.bsky.social"
+      }
+    }
+  ],
+  "contact": {
+    "sources": "https://github.com/p1k0chu/auto-clicker_mc",
+    "issues": "https://github.com/p1k0chu/auto-clicker_mc/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/auto_clicker/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "com.github.p1k0chu.mcmod.auto_clicker.client.AutoClicker"
+      }
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
