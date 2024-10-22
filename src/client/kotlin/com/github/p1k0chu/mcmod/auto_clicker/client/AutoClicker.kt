@@ -145,9 +145,6 @@ object AutoClicker : ClientModInitializer {
         if (holding.config.active) {
             if (holding.config.spamming) {
                 if (holding.timeout-- <= 0) {
-                    // reset the timeout
-                    holding.timeout = holding.config.cooldown
-
                     val trace: HitResult? = client?.crosshairTarget
 
                     if (trace?.type == HitResult.Type.ENTITY) {
@@ -164,6 +161,8 @@ object AutoClicker : ClientModInitializer {
                                 client?.player?.swingHand(Hand.MAIN_HAND)
                                 // stop using item when you attack entities
                                 client?.interactionManager?.stopUsingItem(client?.player)
+                                // reset the timeout
+                                holding.timeout = holding.config.cooldown
                             }
                             // interact with entity
                             holdingRight -> {
@@ -183,9 +182,16 @@ object AutoClicker : ClientModInitializer {
                                         trace.entity,
                                         Hand.OFF_HAND
                                     )
+                                    if(result1?.isAccepted == true) {
+                                        // reset the timeout
+                                        holding.timeout = holding.config.cooldown
+                                    }
 
                                     if (result1?.shouldSwingHand() == true)
                                         client?.player?.swingHand(Hand.OFF_HAND)
+                                } else if(result?.isAccepted == true) {
+                                    // reset the timeout
+                                    holding.timeout = holding.config.cooldown
                                 }
                             }
                         }
@@ -198,6 +204,8 @@ object AutoClicker : ClientModInitializer {
                                 client?.interactionManager?.attackBlock(trace.blockPos, trace.side)
                                 // stop using item when you hit a block
                                 client?.interactionManager?.stopUsingItem(client?.player)
+                                // reset the timeout
+                                holding.timeout = holding.config.cooldown
                             }
                             // interact with block (right click)
                             client?.options?.useKey -> {
@@ -228,7 +236,13 @@ object AutoClicker : ClientModInitializer {
                                                 interactionManager?.interactItem(player, Hand.OFF_HAND)
                                             }
                                         }
+                                    } else if (result1?.isAccepted == true) {
+                                        // reset the timeout
+                                        holding.timeout = holding.config.cooldown
                                     }
+                                } else if (result?.isAccepted == true) {
+                                    // reset the timeout
+                                    holding.timeout = holding.config.cooldown
                                 }
                             }
                         }
@@ -237,7 +251,14 @@ object AutoClicker : ClientModInitializer {
                             val result2 = interactionManager?.interactItem(player, Hand.MAIN_HAND)
 
                             if (result2?.isAccepted == false) {
-                                interactionManager?.interactItem(player, Hand.OFF_HAND)
+                                val result3 = interactionManager?.interactItem(player, Hand.OFF_HAND)
+                                if(result3?.isAccepted == true) {
+                                    // reset the timeout
+                                    holding.timeout = holding.config.cooldown
+                                }
+                            } else if (result2?.isAccepted == true) {
+                                // reset the timeout
+                                holding.timeout = holding.config.cooldown
                             }
                         }
                     }
