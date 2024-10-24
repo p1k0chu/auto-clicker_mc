@@ -80,6 +80,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             .build()
         ), Language.IGNORE_SHIELD_DESC.text)
 
+        // respect weapon cooldown toggle
+        tooltipsMap.put(this.addDrawableChild(ButtonWidget.Builder(Language.RESPECT_WEAPON_COOLDOWN.getText(AutoClicker.config.leftMouse.respectWeaponCooldown)) { btn: ButtonWidget ->
+            AutoClicker.config.leftMouse.respectWeaponCooldown = !AutoClicker.config.leftMouse.respectWeaponCooldown
+            btn.message = Language.RESPECT_WEAPON_COOLDOWN.getText(AutoClicker.config.leftMouse.respectWeaponCooldown)
+        }
+            .dimensions(width / 2 - 160, height / 2 + 58, 100, 20)
+            .build()
+        ), Language.RESPECT_WEAPON_COOLDOWN_DESC.text)
+
         // right mouse button
         // active toggle
         this.addDrawableChild(

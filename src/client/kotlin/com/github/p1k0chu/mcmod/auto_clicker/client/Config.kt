@@ -14,7 +14,8 @@ class Config(
         active: Boolean = false,
         spamming: Boolean = false,
         ignoreBlocks: Boolean = false,
-        var ignoreShield: Boolean = true
+        var ignoreShield: Boolean = true,
+        var respectWeaponCooldown: Boolean = false
     ) : MouseConfig(cooldown, active, spamming, ignoreBlocks)
 
     /**

@@ -160,6 +160,11 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
+        // check for weapon cooldown
+        if((holding.config as? Config.AttackConfig)?.respectWeaponCooldown == true && !isWeaponReady()) {
+            return
+        }
+
         client?.interactionManager?.attackEntity(
             client?.player,
             trace.entity
@@ -173,6 +178,12 @@ object AutoClicker : ClientModInitializer {
         // reset the timeout
         holding.timeout = holding.config.cooldown
 
+    }
+
+    private fun isWeaponReady(): Boolean {
+        if(client?.player == null) return false
+
+        return client!!.player!!.getAttackCooldownProgress(0f) == 1f
     }
 
     private fun attemptMobInteract(trace: EntityHitResult, holding: Holding) {
@@ -263,7 +274,7 @@ object AutoClicker : ClientModInitializer {
     // handler for attack and use
     private fun handleHolding(holding: Holding) {
         if (holding.config.active) {
-            if (holding.config.spamming) {
+            if (holding.config.spamming && (holding.config as? Config.AttackConfig)?.respectWeaponCooldown != true) {
                 if (holding.timeout-- <= 0) {
                     val trace: HitResult? = client?.crosshairTarget
 
@@ -276,6 +287,14 @@ object AutoClicker : ClientModInitializer {
                     } else if (trace?.type == HitResult.Type.MISS) {
                         itemUse(holding)
                     }
+                }
+            } else if((holding.config as? Config.AttackConfig)?.respectWeaponCooldown == true) {
+                val trace: HitResult? = client?.crosshairTarget
+
+                if(trace?.type == HitResult.Type.ENTITY) {
+                    attemptMobAttack(trace as EntityHitResult, holding)
+                } else if(trace?.type == HitResult.Type.BLOCK && (holding.config as? Config.MouseConfig)?.ignoreBlocks != true) {
+                    attemptBlockAttack(trace as BlockHitResult, holding)
                 }
             } else {
                 // if not spamming... then just hold the button?

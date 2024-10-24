@@ -4,6 +4,8 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 
 enum class Language(val key: String) {
+    RESPECT_WEAPON_COOLDOWN_DESC("auto_clicker.hud.respect_weapon_cd_desc"),
+    RESPECT_WEAPON_COOLDOWN("auto_clicker.hud.respect_weapon_cd"),
     IGNORE_SHIELD("auto_clicker.hud.ignore_shield"),
     IGNORE_SHIELD_DESC("auto_clicker.hud.ignore_shield_desc"),
     IGNORE_BLOCKS("auto_clicker.hud.ignore_blocks"),
