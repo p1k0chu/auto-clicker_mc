@@ -1,4 +1,6 @@
 {
+  "auto_clicker.hud.ignore_shield": "Ignore shield: %s",
+  "auto_clicker.hud.ignore_shield_desc": "If false, will not attack mobs when shield is up",
   "auto_clicker.hud.ignore_blocks": "Ignore blocks: %s",
   "auto_clicker.hud.ignore_blocks_desc": "Will not click on blocks",
   "auto_clicker.hud.spamming_desc": "When true - spam the button. When false - hold it",

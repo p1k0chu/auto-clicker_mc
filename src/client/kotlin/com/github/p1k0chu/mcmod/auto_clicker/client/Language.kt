@@ -4,6 +4,8 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 
 enum class Language(val key: String) {
+    IGNORE_SHIELD("auto_clicker.hud.ignore_shield"),
+    IGNORE_SHIELD_DESC("auto_clicker.hud.ignore_shield_desc"),
     IGNORE_BLOCKS("auto_clicker.hud.ignore_blocks"),
     IGNORE_BLOCKS_DESC("auto_clicker.hud.ignore_blocks_desc"),
     SPAMMING_DESCRIPTION("auto_clicker.hud.spamming_desc"),

@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.render.RenderTickCounter
+import net.minecraft.item.ShieldItem
 import net.minecraft.util.Colors
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
@@ -154,6 +155,11 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
+        // if we do NOT ignore the shield, and its up - return
+        if((holding.config as? Config.AttackConfig)?.ignoreShield != true && isShieldUp()) {
+            return
+        }
+
         client?.interactionManager?.attackEntity(
             client?.player,
             trace.entity
@@ -194,6 +200,11 @@ object AutoClicker : ClientModInitializer {
 
     private fun attemptBlockAttack(trace: BlockHitResult, holding: Holding) {
         if(holding != holdingLeft) {
+            return
+        }
+
+        // if we do NOT ignore the shield, and its up - return
+        if((holding.config as? Config.AttackConfig)?.ignoreShield != true && isShieldUp()) {
             return
         }
 
@@ -259,7 +270,7 @@ object AutoClicker : ClientModInitializer {
                     if(trace?.type == HitResult.Type.ENTITY) {
                         attemptMobInteract(trace as EntityHitResult, holding)
                         attemptMobAttack(trace, holding)
-                    } else if(trace?.type == HitResult.Type.BLOCK && (holding.config as? Config.AttackConfig)?.ignoreBlocks != true) {
+                    } else if(trace?.type == HitResult.Type.BLOCK && (holding.config as? Config.MouseConfig)?.ignoreBlocks != true) {
                         attemptBlockAttack(trace as BlockHitResult, holding)
                         attemptBlockInteract(trace, holding)
                     } else if (trace?.type == HitResult.Type.MISS) {
@@ -272,5 +283,13 @@ object AutoClicker : ClientModInitializer {
                 holding.key.isPressed = true
             }
         }
+    }
+
+    private fun isShieldUp(): Boolean {
+        if(client?.player?.isUsingItem != true) {
+            return false
+        }
+
+        return client?.player?.activeItem?.item is ShieldItem
     }
 }

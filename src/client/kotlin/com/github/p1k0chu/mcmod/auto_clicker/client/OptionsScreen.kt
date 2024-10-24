@@ -71,6 +71,15 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
             .build()
         ), Language.IGNORE_BLOCKS_DESC.text)
 
+        // ignore shield toggle
+        tooltipsMap.put(this.addDrawableChild(ButtonWidget.Builder(Language.IGNORE_SHIELD.getText(AutoClicker.config.leftMouse.ignoreShield)) { btn: ButtonWidget ->
+            AutoClicker.config.leftMouse.ignoreShield = !AutoClicker.config.leftMouse.ignoreShield
+            btn.message = Language.IGNORE_SHIELD.getText(AutoClicker.config.leftMouse.ignoreShield)
+        }
+            .dimensions(width / 2 - 160, height / 2 + 36, 100, 20)
+            .build()
+        ), Language.IGNORE_SHIELD_DESC.text)
+
         // right mouse button
         // active toggle
         this.addDrawableChild(
