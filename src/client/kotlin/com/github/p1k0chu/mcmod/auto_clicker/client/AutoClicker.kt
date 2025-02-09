@@ -12,6 +12,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.item.ShieldItem
+import net.minecraft.util.ActionResult
 import net.minecraft.util.Colors
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
@@ -197,9 +198,10 @@ object AutoClicker : ClientModInitializer {
                 trace.entity,
                 hand
             )
-            if(result?.isAccepted == true) {
-                if (result.shouldSwingHand() == true)
-                    client?.player?.swingHand(Hand.OFF_HAND)
+            if(result is ActionResult.Success) {
+                if(result.swingSource != ActionResult.SwingSource.NONE) {
+                    client?.player?.swingHand(hand)
+                }
 
                 // reset the timeout
                 holding.timeout = holding.config.cooldown
@@ -237,8 +239,8 @@ object AutoClicker : ClientModInitializer {
                 hand,
                 trace
             )
-            if(result?.isAccepted == true) {
-                if (result.shouldSwingHand() == true) {
+            if(result is ActionResult.Success) {
+                if(result.swingSource != ActionResult.SwingSource.NONE) {
                     client?.player?.swingHand(hand)
                 }
                 // reset the timeout
@@ -257,8 +259,8 @@ object AutoClicker : ClientModInitializer {
         Hand.entries.forEach { hand: Hand ->
             val result = client?.interactionManager?.interactItem(client?.player, hand)
 
-            if (result?.isAccepted == true) {
-                if(result.shouldSwingHand()) {
+            if(result is ActionResult.Success) {
+                if(result.swingSource != ActionResult.SwingSource.NONE) {
                     client?.player?.swingHand(hand)
                 }
 
