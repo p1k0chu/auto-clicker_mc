@@ -178,7 +178,6 @@ object AutoClicker : ClientModInitializer {
 
         // reset the timeout
         holding.timeout = holding.config.cooldown
-
     }
 
     private fun isWeaponReady(): Boolean = client?.player?.getAttackCooldownProgress(0f) == 1f
@@ -272,8 +271,6 @@ object AutoClicker : ClientModInitializer {
                 return
             }
         }
-
-
     }
 
     // handler for attack and use
