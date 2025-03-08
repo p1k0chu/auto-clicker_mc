@@ -156,13 +156,13 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
-        // if we do NOT ignore the shield, and its up - return
-        if((holding.config as? Config.AttackConfig)?.ignoreShield != true && isShieldUp()) {
+        val config = holding.config as? Config.AttackConfig ?: return
+
+        if (isShieldUp() && !config.ignoreShield) {
             return
         }
 
-        // check for weapon cooldown
-        if((holding.config as? Config.AttackConfig)?.respectWeaponCooldown == true && !isWeaponReady()) {
+        if (config.respectWeaponCooldown && !isWeaponReady()) {
             return
         }
 
@@ -181,11 +181,7 @@ object AutoClicker : ClientModInitializer {
 
     }
 
-    private fun isWeaponReady(): Boolean {
-        if(client?.player == null) return false
-
-        return client!!.player!!.getAttackCooldownProgress(0f) == 1f
-    }
+    private fun isWeaponReady(): Boolean = client?.player?.getAttackCooldownProgress(0f) == 1f
 
     private fun attemptMobInteract(trace: EntityHitResult, holding: Holding) {
         if (holding != holdingRight) {
@@ -216,20 +212,27 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
+        val config = holding.config as? Config.AttackConfig ?: return
+
         // if we do NOT ignore the shield, and its up - return
-        if((holding.config as? Config.AttackConfig)?.ignoreShield != true && isShieldUp()) {
+        if(!config.ignoreShield && isShieldUp()) {
             return
         }
 
-        client?.interactionManager?.attackBlock(trace.blockPos, trace.side)
-        // stop using item when you hit a block
-        client?.interactionManager?.stopUsingItem(client?.player)
+        val interactionManager = client?.interactionManager ?: return
+
+        if (interactionManager.attackBlock(trace.blockPos, trace.side)) {
+            // stop using item when you hit a block
+            interactionManager.stopUsingItem(client?.player)
+        }
         // reset the timeout
         holding.timeout = holding.config.cooldown
     }
 
     private fun attemptBlockInteract(trace: BlockHitResult, holding: Holding) {
-        if(holding != holdingRight) {
+        val config = holding.config as? Config.MouseConfig ?: return
+
+        if (holding != holdingRight || config.ignoreBlocks) {
             return
         }
 
@@ -244,7 +247,7 @@ object AutoClicker : ClientModInitializer {
                     client?.player?.swingHand(hand)
                 }
                 // reset the timeout
-                holding.timeout = holding.config.cooldown
+                holding.timeout = config.cooldown
 
                 return
             }
@@ -280,14 +283,18 @@ object AutoClicker : ClientModInitializer {
                 if (holding.timeout-- <= 0) {
                     val trace: HitResult? = client?.crosshairTarget
 
-                    if(trace?.type == HitResult.Type.ENTITY) {
-                        attemptMobInteract(trace as EntityHitResult, holding)
-                        attemptMobAttack(trace, holding)
-                    } else if(trace?.type == HitResult.Type.BLOCK && (holding.config as? Config.MouseConfig)?.ignoreBlocks != true) {
-                        attemptBlockAttack(trace as BlockHitResult, holding)
-                        attemptBlockInteract(trace, holding)
-                    } else if (trace?.type == HitResult.Type.MISS) {
-                        itemUse(holding)
+                    when(trace?.type) {
+                        HitResult.Type.ENTITY -> {
+                            attemptMobInteract(trace as EntityHitResult, holding)
+                            attemptMobAttack(trace, holding)
+                        }
+                        HitResult.Type.BLOCK -> {
+                            attemptBlockAttack(trace as BlockHitResult, holding)
+                            attemptBlockInteract(trace, holding)
+                        }
+                        HitResult.Type.MISS -> {
+                            itemUse(holding)
+                        }
                     }
                 }
             } else if((holding.config as? Config.AttackConfig)?.respectWeaponCooldown == true) {
