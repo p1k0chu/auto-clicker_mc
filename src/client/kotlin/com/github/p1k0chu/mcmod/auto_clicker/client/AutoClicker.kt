@@ -292,6 +292,7 @@ object AutoClicker : ClientModInitializer {
                         HitResult.Type.MISS -> {
                             itemUse(holding)
                         }
+                        else -> {}
                     }
                 }
             } else if((holding.config as? Config.AttackConfig)?.respectWeaponCooldown == true) {
