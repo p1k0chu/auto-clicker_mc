@@ -4,11 +4,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.0.21"
     id("fabric-loom") version "1.9.1"
-    id("maven-publish")
+    id("com.modrinth.minotaur") version "2.+"
 }
 
 version = project.property("mod_version") as String
 group = project.property("maven_group") as String
+val mod_version: String by project
+val minecraft_version: String by project
+val loader_version: String by project
+val kotlin_loader_version: String by project
 
 base {
     archivesName.set(project.property("archives_base_name") as String)
@@ -54,16 +58,16 @@ dependencies {
 
 tasks.processResources {
     inputs.property("version", project.version)
-    inputs.property("minecraft_version", project.property("minecraft_version"))
-    inputs.property("loader_version", project.property("loader_version"))
+    inputs.property("minecraft_version", minecraft_version)
+    inputs.property("loader_version", loader_version)
     filteringCharset = "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand(
             "version" to project.version,
-            "minecraft_version" to project.property("minecraft_version"),
-            "loader_version" to project.property("loader_version"),
-            "kotlin_loader_version" to project.property("kotlin_loader_version")
+            "minecraft_version" to minecraft_version,
+            "loader_version" to loader_version,
+            "kotlin_loader_version" to kotlin_loader_version
         )
     }
 }
@@ -87,20 +91,23 @@ tasks.jar {
     }
 }
 
-// configure the maven publication
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            artifactId = project.property("archives_base_name") as String
-            from(components["java"])
-        }
-    }
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "JAYD9vCA" // This can be the project ID or the slug. Either will work!
+    syncBodyFrom = rootProject.file("README.md").readText()
 
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
+    versionNumber = mod_version
+    versionType = "release" // `release`, `beta` or `alpha`
+    gameVersions.add(minecraft_version)
+
+    uploadFile.set(tasks.remapJar)
+    loaders.add("fabric")
+
+    dependencies { // A special DSL for creating dependencies
+        // scope.type
+        // The scope can be `required`, `optional`, `incompatible`, or `embedded`
+        // The type can either be `project` or `version`
+        required.project("fabric-api") // Creates a new required dependency on Fabric API
+        required.project("fabric-language-kotlin")
     }
 }
