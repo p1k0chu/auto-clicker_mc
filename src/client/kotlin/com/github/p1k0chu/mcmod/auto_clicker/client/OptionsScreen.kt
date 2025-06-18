@@ -217,7 +217,6 @@ class OptionsScreen(name: String? = null) : Screen(Text.of(name ?: "Auto Clicker
         mouseY: Int,
         delta: Float
     ) {
-        this.renderBackground(context, mouseX, mouseY, delta)
         super.render(context, mouseX, mouseY, delta)
 
         context?.drawCenteredTextWithShadow(
