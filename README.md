@@ -21,7 +21,7 @@ Keys have individual settings:
     - when enabled the key will be clicked repeatedly with a set delay (or no delay)
     - when disabled the key will be held. delay, and other options below dont have an effect in this mode.
 - **'ignore blocks'** mode: wont click on blocks. for example, you would attack mobs but not blocks.
-- **'ignore shield'** mode: on by default. when enabled, autoclicker wont attack when your shield is up.
+- **'ignore shield'** mode: on by default. when disabled, autoclicker wont attack when your shield is up.
 - **'Weapon cooldown'**: true/false': when true, will only attack when the weapon is fully charged
 
 In disabled state, the mod doesn't do anything.  
