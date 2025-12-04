@@ -213,8 +213,9 @@ object AutoClicker : ClientModInitializer {
 
         val config = holding.config as? Config.AttackConfig ?: return
 
+        // if we ignore blocks or
         // if we do NOT ignore the shield, and its up - return
-        if(!config.ignoreShield && isShieldUp()) {
+        if(config.ignoreBlocks || !config.ignoreShield && isShieldUp()) {
             return
         }
 
