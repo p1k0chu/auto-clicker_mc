@@ -7,7 +7,7 @@
   "auto_clicker.hud.ignore_blocks_desc": "ilo li weka e leko",
   "auto_clicker.hud.spamming_desc": "kama ni la, ilo sike li awen e nena tan ni: kama ala la, ilo sike li awen e nena.",
   "auto_clicker.hud.disable_on_death": "tenpo pali la pini: %s",
-  "category.auto_clicker": "nena pi ilo sike",
+  "key.category.auto_clicker.auto_clicker": "nena pi ilo sike",
   "auto_clicker.key.open-gui": "lukin e ante nasin",
   "auto_clicker.key.toggle-functionality": "ante",
   "auto_clicker.hud.delay": "tenpo li kipisi e pali",

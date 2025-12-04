@@ -14,7 +14,6 @@ enum class Language(val key: String) {
     DISABLE_ON_DEATH("auto_clicker.hud.disable_on_death"),
     ACTIVE_BUTTON("auto_clicker.hud.active_btn"),
     ACTIVE("auto_clicker.hud.active"),
-    SETTINGS_CATEGORY("category.auto_clicker"),
     TOGGLE("auto_clicker.key.toggle-functionality"),
     OPEN_SETTINGS("auto_clicker.key.open-gui"),
     COOLDOWN("auto_clicker.hud.delay"),

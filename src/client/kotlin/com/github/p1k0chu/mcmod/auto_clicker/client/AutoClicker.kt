@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.DeltaTracker
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ShieldItem
 import net.minecraft.world.InteractionResult
 import net.minecraft.util.CommonColors
@@ -38,8 +39,15 @@ object AutoClicker : ClientModInitializer {
     // the file might not exist
     val CONFIG_FILE: Path = CONFIG_FOLDER.resolve("$MOD_ID.json")
 
-    private val openConfig = KeyMapping(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_O, Language.SETTINGS_CATEGORY.key)
-    private val toggleFunction = KeyMapping(Language.TOGGLE.key, GLFW.GLFW_KEY_I, Language.SETTINGS_CATEGORY.key)
+    private val openConfig: KeyMapping
+    private val toggleFunction: KeyMapping
+
+    init {
+        val keyMappingCategory = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, MOD_ID))
+
+        openConfig = KeyMapping(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_O, keyMappingCategory)
+        toggleFunction = KeyMapping(Language.TOGGLE.key, GLFW.GLFW_KEY_I, keyMappingCategory)
+    }
 
     val config: Config = loadConfig()
     var active: Boolean = false

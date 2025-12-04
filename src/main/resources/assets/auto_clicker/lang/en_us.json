@@ -7,7 +7,7 @@
   "auto_clicker.hud.ignore_blocks_desc": "Will not click on blocks",
   "auto_clicker.hud.spamming_desc": "When true - spam the button. When false - hold it",
   "auto_clicker.hud.disable_on_death": "Disable on death: %s",
-  "category.auto_clicker": "Auto Clicker keybindings",
+  "key.category.auto_clicker.auto_clicker": "Auto Clicker keybindings",
   "auto_clicker.key.open-gui": "Open settings GUI",
   "auto_clicker.key.toggle-functionality": "Toggle enabled/disabled",
   "auto_clicker.hud.delay": "Delay after every click",
