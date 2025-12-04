@@ -1,7 +1,7 @@
 package com.github.p1k0chu.mcmod.auto_clicker.client
 
-import net.minecraft.text.MutableText
-import net.minecraft.text.Text
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Component
 
 enum class Language(val key: String) {
     RESPECT_WEAPON_COOLDOWN_DESC("auto_clicker.hud.respect_weapon_cd_desc"),
@@ -23,7 +23,7 @@ enum class Language(val key: String) {
     JUMP("auto_clicker.hud.jump_button"),
     SPAMMING("auto_clicker.hud.spamming");
 
-    val text: MutableText = Text.translatable(key)
+    val text: MutableComponent = Component.translatable(key)
 
-    fun getText(vararg args: Any): MutableText = Text.translatable(key, *args)
+    fun getText(vararg args: Any): MutableComponent = Component.translatable(key, *args)
 }

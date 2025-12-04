@@ -7,17 +7,17 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.option.KeyBinding
-import net.minecraft.client.render.RenderTickCounter
-import net.minecraft.item.ShieldItem
-import net.minecraft.util.ActionResult
-import net.minecraft.util.Colors
-import net.minecraft.util.Hand
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.EntityHitResult
-import net.minecraft.util.hit.HitResult
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.KeyMapping
+import net.minecraft.client.DeltaTracker
+import net.minecraft.world.item.ShieldItem
+import net.minecraft.world.InteractionResult
+import net.minecraft.util.CommonColors
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
 import org.lwjgl.glfw.GLFW
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -29,8 +29,8 @@ import kotlin.io.path.writer
 object AutoClicker : ClientModInitializer {
     const val MOD_ID: String = "auto_clicker"
     val logger = LoggerFactory.getLogger(MOD_ID)
-    val client: MinecraftClient?
-        get() = MinecraftClient.getInstance()
+    val client: Minecraft?
+        get() = Minecraft.getInstance()
 
     // config folder is automatically created by fabric loader
     val CONFIG_FOLDER: Path = FabricLoader.getInstance().configDir
@@ -38,8 +38,8 @@ object AutoClicker : ClientModInitializer {
     // the file might not exist
     val CONFIG_FILE: Path = CONFIG_FOLDER.resolve("$MOD_ID.json")
 
-    private val openConfig = KeyBinding(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_O, Language.SETTINGS_CATEGORY.key)
-    private val toggleFunction = KeyBinding(Language.TOGGLE.key, GLFW.GLFW_KEY_I, Language.SETTINGS_CATEGORY.key)
+    private val openConfig = KeyMapping(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_O, Language.SETTINGS_CATEGORY.key)
+    private val toggleFunction = KeyMapping(Language.TOGGLE.key, GLFW.GLFW_KEY_I, Language.SETTINGS_CATEGORY.key)
 
     val config: Config = loadConfig()
     var active: Boolean = false
@@ -52,9 +52,9 @@ object AutoClicker : ClientModInitializer {
                 holdingJump.timeout = holdingJump.config.cooldown
             } else {
                 // release all the buttons
-                holdingLeft.key.isPressed = false
-                holdingRight.key.isPressed = false
-                holdingJump.key.isPressed = false
+                holdingLeft.key.setDown(false)
+                holdingRight.key.setDown(false)
+                holdingJump.key.setDown(false)
             }
         }
 
@@ -64,14 +64,14 @@ object AutoClicker : ClientModInitializer {
 
     override fun onInitializeClient() {
         ClientLifecycleEvents.CLIENT_STARTED.register { mc ->
-            holdingLeft = Holding(mc.options.attackKey, config.leftMouse)
-            holdingRight = Holding(mc.options.useKey, config.rightMouse)
-            holdingJump = Holding(mc.options.jumpKey, config.jump)
+            holdingLeft = Holding(mc.options.keyAttack, config.leftMouse)
+            holdingRight = Holding(mc.options.keyUse, config.rightMouse)
+            holdingJump = Holding(mc.options.keyJump, config.jump)
         }
 
-        HudRenderCallback.EVENT.register { context: DrawContext, tickCounter: RenderTickCounter? ->
+        HudRenderCallback.EVENT.register { context: GuiGraphics, tickCounter: DeltaTracker? ->
             if (active) {
-                context.drawText(client!!.textRenderer, Language.ACTIVE.text, 2, context.scaledWindowHeight - client!!.textRenderer.fontHeight - 2, Colors.WHITE, true)
+                context.drawString(client!!.font, Language.ACTIVE.text, 2, context.guiHeight() - client!!.font.lineHeight - 2, CommonColors.WHITE, true)
             }
         }
 
@@ -102,9 +102,9 @@ object AutoClicker : ClientModInitializer {
         }
     }
 
-    private fun clientTick(mc: MinecraftClient) {
+    private fun clientTick(mc: Minecraft) {
         if (active) {
-            if (mc.player?.isDead == true) {
+            if (mc.player?.isDeadOrDying == true) {
                 if (config.deactivateOnDeath) {
                     active = false
                 }
@@ -116,10 +116,10 @@ object AutoClicker : ClientModInitializer {
         }
 
         // key presses
-        while (toggleFunction.wasPressed()) {
+        while (toggleFunction.consumeClick()) {
             active = !active
         }
-        while (openConfig.wasPressed()) {
+        while (openConfig.consumeClick()) {
             active = false
             mc.setScreen(OptionsScreen())
         }
@@ -133,7 +133,7 @@ object AutoClicker : ClientModInitializer {
         if(holding.config.active) {
             if(holding.config.spamming) {
                 if (holding.timeout-- <= 1) {
-                    holding.key.isPressed = holding.timeout == 0
+                    holding.key.setDown(holding.timeout == 0)
 
                     if(holding.timeout <= -1) {
                         if (holding.config.cooldown >= 1) {
@@ -143,10 +143,10 @@ object AutoClicker : ClientModInitializer {
                         }
                     }
                 } else {
-                    holding.key.isPressed = false
+                    holding.key.setDown(false)
                 }
             } else {
-                holding.key.isPressed = true
+                holding.key.setDown(true)
             }
         }
     }
@@ -166,36 +166,36 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
-        client?.interactionManager?.attackEntity(
+        client?.gameMode?.attack(
             client?.player,
             trace.entity
         )
         // cosmetic
-        client?.player?.swingHand(Hand.MAIN_HAND)
+        client?.player?.swing(InteractionHand.MAIN_HAND)
 
         // stop using item when you attack entities
-        client?.interactionManager?.stopUsingItem(client?.player)
+        client?.gameMode?.releaseUsingItem(client?.player)
 
         // reset the timeout
         holding.timeout = holding.config.cooldown
     }
 
-    private fun isWeaponReady(): Boolean = client?.player?.getAttackCooldownProgress(0f) == 1f
+    private fun isWeaponReady(): Boolean = client?.player?.getAttackStrengthScale(0f) == 1f
 
     private fun attemptMobInteract(trace: EntityHitResult, holding: Holding) {
         if (holding != holdingRight) {
             return
         }
 
-        Hand.entries.forEach { hand: Hand ->
-            val result = client?.interactionManager?.interactEntity(
+        InteractionHand.entries.forEach { hand: InteractionHand ->
+            val result = client?.gameMode?.interact(
                 client!!.player,
                 trace.entity,
                 hand
             )
-            if(result is ActionResult.Success) {
-                if(result.swingSource != ActionResult.SwingSource.NONE) {
-                    client?.player?.swingHand(hand)
+            if(result is InteractionResult.Success) {
+                if(result.swingSource != InteractionResult.SwingSource.NONE) {
+                    client?.player?.swing(hand)
                 }
 
                 // reset the timeout
@@ -219,11 +219,11 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
-        val interactionManager = client?.interactionManager ?: return
+        val interactionManager = client?.gameMode ?: return
 
-        if (interactionManager.attackBlock(trace.blockPos, trace.side)) {
+        if (interactionManager.startDestroyBlock(trace.blockPos, trace.direction)) {
             // stop using item when you hit a block
-            interactionManager.stopUsingItem(client?.player)
+            interactionManager.releaseUsingItem(client?.player)
         }
         // reset the timeout
         holding.timeout = holding.config.cooldown
@@ -236,15 +236,15 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
-        Hand.entries.forEach { hand: Hand ->
-            val result = client?.interactionManager?.interactBlock(
+        InteractionHand.entries.forEach { hand: InteractionHand ->
+            val result = client?.gameMode?.useItemOn(
                 client!!.player,
                 hand,
                 trace
             )
-            if(result is ActionResult.Success) {
-                if(result.swingSource != ActionResult.SwingSource.NONE) {
-                    client?.player?.swingHand(hand)
+            if(result is InteractionResult.Success) {
+                if(result.swingSource != InteractionResult.SwingSource.NONE) {
+                    client?.player?.swing(hand)
                 }
                 // reset the timeout
                 holding.timeout = config.cooldown
@@ -259,12 +259,12 @@ object AutoClicker : ClientModInitializer {
             return
         }
 
-        Hand.entries.forEach { hand: Hand ->
-            val result = client?.interactionManager?.interactItem(client?.player, hand)
+        InteractionHand.entries.forEach { hand: InteractionHand ->
+            val result = client?.gameMode?.useItem(client?.player, hand)
 
-            if(result is ActionResult.Success) {
-                if(result.swingSource != ActionResult.SwingSource.NONE) {
-                    client?.player?.swingHand(hand)
+            if(result is InteractionResult.Success) {
+                if(result.swingSource != InteractionResult.SwingSource.NONE) {
+                    client?.player?.swing(hand)
                 }
 
                 holding.timeout = holding.config.cooldown
@@ -279,7 +279,7 @@ object AutoClicker : ClientModInitializer {
         if (holding.config.active) {
             if (holding.config.spamming && (holding.config as? Config.AttackConfig)?.respectWeaponCooldown != true) {
                 if (holding.timeout-- <= 0) {
-                    val trace: HitResult? = client?.crosshairTarget
+                    val trace: HitResult? = client?.hitResult
 
                     when(trace?.type) {
                         HitResult.Type.ENTITY -> {
@@ -297,7 +297,7 @@ object AutoClicker : ClientModInitializer {
                     }
                 }
             } else if((holding.config as? Config.AttackConfig)?.respectWeaponCooldown == true) {
-                val trace: HitResult? = client?.crosshairTarget
+                val trace: HitResult? = client?.hitResult
 
                 if(trace?.type == HitResult.Type.ENTITY) {
                     attemptMobAttack(trace as EntityHitResult, holding)
@@ -307,7 +307,7 @@ object AutoClicker : ClientModInitializer {
             } else {
                 // if not spamming... then just hold the button?
                 // p. s. button is released when auto clicker is not active
-                holding.key.isPressed = true
+                holding.key.setDown(true)
             }
         }
     }
@@ -317,6 +317,6 @@ object AutoClicker : ClientModInitializer {
             return false
         }
 
-        return client?.player?.activeItem?.item is ShieldItem
+        return client?.player?.useItem?.item is ShieldItem
     }
 }
