@@ -61,9 +61,9 @@ object AutoClicker : ClientModInitializer {
                 holdingJump.timeout = holdingJump.config.cooldown
             } else {
                 // release all the buttons
-                holdingLeft.key.setDown(false)
-                holdingRight.key.setDown(false)
-                holdingJump.key.setDown(false)
+                holdingLeft.key.isDown = false
+                holdingRight.key.isDown = false
+                holdingJump.key.isDown = false
             }
         }
 
@@ -154,7 +154,7 @@ object AutoClicker : ClientModInitializer {
         if(holding.config.active) {
             if(holding.config.spamming) {
                 if (holding.timeout-- <= 1) {
-                    holding.key.setDown(holding.timeout == 0)
+                    holding.key.isDown = holding.timeout == 0
 
                     if(holding.timeout <= -1) {
                         if (holding.config.cooldown >= 1) {
