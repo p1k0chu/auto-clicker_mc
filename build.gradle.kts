@@ -7,7 +7,9 @@ plugins {
     id("com.modrinth.minotaur") version "2.+"
 }
 
-version = project.property("mod_version") as String
+version = System.getenv("MOD_VERSION") ?: "999.0.0-dev"
+println("Mod version: $version")
+
 group = project.property("maven_group") as String
 val mod_version: String by project
 val minecraft_version: String by project
