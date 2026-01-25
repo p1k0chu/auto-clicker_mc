@@ -212,28 +212,28 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
     }
 
     override fun render(
-        context: GuiGraphics?,
+        context: GuiGraphics,
         mouseX: Int,
         mouseY: Int,
         delta: Float
     ) {
         super.render(context, mouseX, mouseY, delta)
 
-        context?.drawCenteredString(
+        context.drawCenteredString(
             font,
             Language.LEFT_MOUSE_BUTTON.text,
             width/2 - 110, height / 2 - 60,
             CommonColors.WHITE,
         )
 
-        context?.drawCenteredString(
+        context.drawCenteredString(
             font,
             Language.RIGHT_MOUSE_BUTTON.text,
             width/2, height / 2 - 60,
             CommonColors.WHITE,
         )
 
-        context?.drawCenteredString(
+        context.drawCenteredString(
             font,
             Language.JUMP.text,
             width/2 + 110, height / 2 - 60,
@@ -243,7 +243,7 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
         // draw tooltips
         tooltipsMap.forEach { (widget, text) ->
             if(widget.isMouseOver(mouseX.toDouble(), mouseY.toDouble())) {
-                context?.setTooltipForNextFrame(font, text, mouseX, mouseY)
+                context.setTooltipForNextFrame(font, text, mouseX, mouseY)
             }
         }
     }
