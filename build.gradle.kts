@@ -11,7 +11,6 @@ version = System.getenv("MOD_VERSION") ?: "999.0.0-dev"
 println("Mod version: $version")
 
 group = project.property("maven_group") as String
-val mod_version: String by project
 val minecraft_version: String by project
 val loader_version: String by project
 val kotlin_loader_version: String by project
@@ -89,7 +88,7 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.jar {
     from("LICENSE") {
-        rename { "${it}_${project.base.archivesName}" }
+        rename { "${it}_${project.base.archivesName.get()}" }
     }
 }
 
@@ -98,7 +97,7 @@ modrinth {
     projectId = "JAYD9vCA" // This can be the project ID or the slug. Either will work!
     syncBodyFrom = rootProject.file("README.md").readText()
 
-    versionNumber = mod_version
+    versionNumber = version.toString()
     versionType = "release" // `release`, `beta` or `alpha`
     gameVersions.add(minecraft_version)
 
