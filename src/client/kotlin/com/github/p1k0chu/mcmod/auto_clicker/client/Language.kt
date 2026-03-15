@@ -12,6 +12,7 @@ enum class Language(val key: String) {
     IGNORE_BLOCKS_DESC("auto_clicker.hud.ignore_blocks_desc"),
     SPAMMING_DESCRIPTION("auto_clicker.hud.spamming_desc"),
     DISABLE_ON_DEATH("auto_clicker.hud.disable_on_death"),
+    ALLOW_IN_MENUS("auto_clicker.hud.allow_in_menus"),
     ACTIVE_BUTTON("auto_clicker.hud.active_btn"),
     ACTIVE("auto_clicker.hud.active"),
     TOGGLE("auto_clicker.key.toggle-functionality"),

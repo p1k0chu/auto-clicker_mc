@@ -171,6 +171,15 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
 
         jumpDelayWidget.setResponder { value: String -> delayFieldResponder(jumpDelayWidget, AutoClicker.config.jump, value) }
 
+        addRenderableWidget(Button.Builder(Language.ALLOW_IN_MENUS.getText(AutoClicker.config.allowedInMenus)) { btn ->
+            AutoClicker.config.allowedInMenus = !AutoClicker.config.allowedInMenus
+            btn.message = Language.ALLOW_IN_MENUS.getText(AutoClicker.config.allowedInMenus)
+        }
+            .size(150, 20)
+            .pos(2, height - 22 - 22)
+            .build()
+        )
+
         // disable on death toggle in the corner
         addRenderableWidget(Button.Builder(Language.DISABLE_ON_DEATH.getText(AutoClicker.config.deactivateOnDeath)) { btn: Button ->
             AutoClicker.config.deactivateOnDeath = !AutoClicker.config.deactivateOnDeath

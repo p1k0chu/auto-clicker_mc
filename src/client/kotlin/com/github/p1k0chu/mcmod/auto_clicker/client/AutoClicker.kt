@@ -124,7 +124,7 @@ object AutoClicker : ClientModInitializer {
     }
 
     private fun clientTick(mc: Minecraft) {
-        if (active) {
+        if ((config.allowedInMenus || mc.screen == null) && active) {
             if (mc.player?.isDeadOrDying == true) {
                 if (config.deactivateOnDeath) {
                     active = false

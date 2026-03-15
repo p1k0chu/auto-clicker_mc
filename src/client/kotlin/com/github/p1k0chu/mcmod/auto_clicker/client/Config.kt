@@ -4,7 +4,8 @@ class Config(
     val leftMouse: AttackConfig = AttackConfig(),
     val rightMouse: MouseConfig = MouseConfig(),
     val jump: SharedConfig = SharedConfig(),
-    var deactivateOnDeath: Boolean = true
+    var deactivateOnDeath: Boolean = true,
+    var allowedInMenus: Boolean = false,
 ) {
     /**
      * Adds ignoreShield to MouseConfig
