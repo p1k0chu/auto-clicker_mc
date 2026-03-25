@@ -4,11 +4,11 @@ import com.google.gson.Gson
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.DeltaTracker
 import net.minecraft.resources.Identifier
@@ -83,9 +83,9 @@ object AutoClicker : ClientModInitializer {
                 MOD_ID,
                 "active_label"
             )
-        ) { context: GuiGraphics, _: DeltaTracker ->
+        ) { context: GuiGraphicsExtractor, _: DeltaTracker ->
             if (active) {
-                context.drawString(
+                context.text(
                     client.font,
                     Language.ACTIVE.text,
                     2,
@@ -97,8 +97,8 @@ object AutoClicker : ClientModInitializer {
         }
 
         // key binds
-        KeyBindingHelper.registerKeyBinding(openConfig)
-        KeyBindingHelper.registerKeyBinding(toggleFunction)
+        KeyMappingHelper.registerKeyMapping(openConfig)
+        KeyMappingHelper.registerKeyMapping(toggleFunction)
 
         ClientTickEvents.END_CLIENT_TICK.register(::clientTick)
     }
@@ -218,6 +218,7 @@ object AutoClicker : ClientModInitializer {
             val result = client.gameMode?.interact(
                 player,
                 trace.entity,
+                trace,
                 hand
             )
             if(result is InteractionResult.Success) {
