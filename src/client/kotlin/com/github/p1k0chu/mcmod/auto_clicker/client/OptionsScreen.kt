@@ -1,6 +1,6 @@
 package com.github.p1k0chu.mcmod.auto_clicker.client
 
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.components.Button
@@ -191,29 +191,29 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
         )
     }
 
-    override fun render(
-        context: GuiGraphics,
+    override fun extractRenderState(
+        context: GuiGraphicsExtractor,
         mouseX: Int,
         mouseY: Int,
         delta: Float
     ) {
-        super.render(context, mouseX, mouseY, delta)
+        super.extractRenderState(context, mouseX, mouseY, delta)
 
-        context.drawCenteredString(
+        context.centeredText(
             font,
             Language.LEFT_MOUSE_BUTTON.text,
             width/2 - 110, height / 2 - 60,
             CommonColors.WHITE,
         )
 
-        context.drawCenteredString(
+        context.centeredText(
             font,
             Language.RIGHT_MOUSE_BUTTON.text,
             width/2, height / 2 - 60,
             CommonColors.WHITE,
         )
 
-        context.drawCenteredString(
+        context.centeredText(
             font,
             Language.JUMP.text,
             width/2 + 110, height / 2 - 60,
