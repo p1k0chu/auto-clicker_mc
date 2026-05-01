@@ -22,8 +22,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
         } catch (_: Exception) {
             widget.value = "0"
         }
-
-        AutoClicker.saveConfig()
     }
 
     protected override fun init() {
@@ -33,8 +31,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             Button.Builder(Language.ACTIVE_BUTTON.getText(AutoClicker.config.leftMouse.active)) { btn: Button ->
                 AutoClicker.config.leftMouse.active = !AutoClicker.config.leftMouse.active
                 btn.message = Language.ACTIVE_BUTTON.getText(AutoClicker.config.leftMouse.active)
-
-                AutoClicker.saveConfig()
             }
                 .bounds(width / 2 - 160, height / 2 - 50, 100, 20)
                 .build()
@@ -44,8 +40,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             Button.Builder(Language.SPAMMING.getText(AutoClicker.config.leftMouse.spamming)) { btn: Button ->
                 AutoClicker.config.leftMouse.spamming = !AutoClicker.config.leftMouse.spamming
                 btn.message = Language.SPAMMING.getText(AutoClicker.config.leftMouse.spamming)
-
-                AutoClicker.saveConfig()
             }
                 .bounds(width / 2 - 160, height / 2 - 29, 100, 20)
                 .build()
@@ -96,8 +90,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             Button.Builder(Language.ACTIVE_BUTTON.getText(AutoClicker.config.rightMouse.active)) { btn: Button ->
                 AutoClicker.config.rightMouse.active = !AutoClicker.config.rightMouse.active
                 btn.message = Language.ACTIVE_BUTTON.getText(AutoClicker.config.rightMouse.active)
-
-                AutoClicker.saveConfig()
             }
                 .bounds(width / 2 - 50, height / 2 - 50, 100, 20)
                 .build()
@@ -107,8 +99,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             Button.Builder(Language.SPAMMING.getText(AutoClicker.config.rightMouse.spamming)) { btn: Button ->
                 AutoClicker.config.rightMouse.spamming = !AutoClicker.config.rightMouse.spamming
                 btn.message = Language.SPAMMING.getText(AutoClicker.config.rightMouse.spamming)
-
-                AutoClicker.saveConfig()
             }
                 .bounds(width / 2 - 50, height / 2 - 29, 100, 20)
                 .build()
@@ -141,8 +131,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             Button.Builder(Language.ACTIVE_BUTTON.getText(AutoClicker.config.jump.active)) { btn: Button ->
                 AutoClicker.config.jump.active = !AutoClicker.config.jump.active
                 btn.message = Language.ACTIVE_BUTTON.getText(AutoClicker.config.jump.active)
-
-                AutoClicker.saveConfig()
             }
                 .bounds(width / 2 + 60, height / 2 - 50, 100, 20)
                 .build()
@@ -152,8 +140,6 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             Button.Builder(Language.SPAMMING.getText(AutoClicker.config.jump.spamming)) { btn: Button ->
                 AutoClicker.config.jump.spamming = !AutoClicker.config.jump.spamming
                 btn.message = Language.SPAMMING.getText(AutoClicker.config.jump.spamming)
-
-                AutoClicker.saveConfig()
             }
                 .bounds(width / 2 + 60, height / 2 - 29, 100, 20)
                 .build()
@@ -226,5 +212,10 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
                 context.setTooltipForNextFrame(font, text, mouseX, mouseY)
             }
         }
+    }
+
+    override fun onClose() {
+        AutoClicker.saveConfig()
+        super.onClose()
     }
 }
