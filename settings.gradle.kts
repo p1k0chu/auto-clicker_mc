@@ -5,4 +5,11 @@ pluginManagement {
         }
         gradlePluginPortal()
     }
+
+    plugins {
+        kotlin("jvm") version providers.gradleProperty("kotlin_version")
+        id("net.fabricmc.fabric-loom") version providers.gradleProperty("loom_version")
+    }
 }
+
+rootProject.name = "auto-clicker"

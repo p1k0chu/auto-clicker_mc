@@ -2,37 +2,26 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.3.10"
-    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT"
+    kotlin("jvm")
+    id("net.fabricmc.fabric-loom")
     id("com.modrinth.minotaur") version "2.+"
-}
-
-version = System.getenv("MOD_VERSION") ?: "999.0.0-dev"
-println("Mod version: $version")
-
-group = project.property("maven_group") as String
-val minecraft_version: String by project
-val loader_version: String by project
-val kotlin_loader_version: String by project
-
-base {
-    archivesName.set(project.property("archives_base_name") as String)
 }
 
 val targetJavaVersion = 25
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
     // If you remove this line, sources will not be generated.
     withSourcesJar()
+    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_25
 }
 
 loom {
     splitEnvironmentSourceSets()
 
     mods {
-        register("auto_clicker") {
+        register(project.name) {
             sourceSet("main")
             sourceSet("client")
         }
@@ -53,21 +42,26 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     implementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
 
-    implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
 }
 
 tasks.processResources {
-    inputs.property("version", project.version)
-    inputs.property("minecraft_version", minecraft_version)
-    inputs.property("loader_version", loader_version)
+    val version = project.version
+    val mcVer = project.property("minecraft_version")!!
+    val loaderVer = project.property("loader_version")!!
+    val kotlinModVer = project.property("kotlin_loader_version")!!
+    inputs.property("version", version)
+    inputs.property("minecraft_version", mcVer)
+    inputs.property("loader_version", loaderVer)
+    inputs.property("kotlin_loader_version", kotlinModVer)
     filteringCharset = "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand(
-            "version" to project.version,
-            "minecraft_version" to minecraft_version,
-            "loader_version" to loader_version,
-            "kotlin_loader_version" to kotlin_loader_version
+            "version" to version,
+            "minecraft_version" to mcVer,
+            "loader_version" to loaderVer,
+            "kotlin_loader_version" to kotlinModVer
         )
     }
 }
@@ -86,8 +80,10 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 tasks.jar {
+    val projectName = project.name
+    inputs.property("projectName", projectName)
     from("LICENSE") {
-        rename { "${it}_${project.base.archivesName.get()}" }
+        rename { "${it}_${projectName}" }
     }
 }
 
@@ -98,7 +94,10 @@ modrinth {
 
     versionNumber = version.toString()
     versionType = "release" // `release`, `beta` or `alpha`
-    gameVersions.add(minecraft_version)
+
+    (project.property("minecraft_publish") as String)
+        .split(" ")
+        .forEach(gameVersions::add)
 
     uploadFile.set(tasks.jar)
     loaders.add("fabric")
