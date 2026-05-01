@@ -177,14 +177,21 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
         )
     }
 
+    //? >=26.1 {
     override fun extractRenderState(
+    //? } else
+    //override fun render(
         context: GuiGraphicsExtractor,
         mouseX: Int,
         mouseY: Int,
         delta: Float
     ) {
+        //? >=26.1 {
         super.extractRenderState(context, mouseX, mouseY, delta)
+        //? } else
+        //super.render(context, mouseX, mouseY, delta)
 
+        //$ centeredText context >>'('
         context.centeredText(
             font,
             Language.LEFT_MOUSE_BUTTON.text,
@@ -192,6 +199,7 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             CommonColors.WHITE,
         )
 
+        //$ centeredText context >>'('
         context.centeredText(
             font,
             Language.RIGHT_MOUSE_BUTTON.text,
@@ -199,6 +207,7 @@ class OptionsScreen(name: String? = null) : Screen(Component.nullToEmpty(name ?:
             CommonColors.WHITE,
         )
 
+        //$ centeredText context >>'('
         context.centeredText(
             font,
             Language.JUMP.text,

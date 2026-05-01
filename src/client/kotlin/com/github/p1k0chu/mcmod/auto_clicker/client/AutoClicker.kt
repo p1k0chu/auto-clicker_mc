@@ -85,7 +85,10 @@ object AutoClicker : ClientModInitializer {
             )
         ) { context: GuiGraphicsExtractor, _: DeltaTracker ->
             if (active) {
+                //? >=26.1 {
                 context.text(
+                //? } else
+                //context.drawString(
                     client.font,
                     Language.ACTIVE.text,
                     2,
@@ -218,6 +221,7 @@ object AutoClicker : ClientModInitializer {
             val result = client.gameMode?.interact(
                 player,
                 trace.entity,
+                //? >=26.1
                 trace,
                 hand
             )
