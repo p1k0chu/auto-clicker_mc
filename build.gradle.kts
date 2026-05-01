@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    id("com.modrinth.minotaur") version "2.+"
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 }
 
 val obfuscated = sc.current.parsed < "26.1"
@@ -102,26 +102,25 @@ tasks.jar {
     }
 }
 
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN")
-    projectId = "JAYD9vCA" // This can be the project ID or the slug. Either will work!
-    syncBodyFrom = rootProject.file("README.md").readText()
+publishMods {
+    file = modJar.flatMap { it.archiveFile }
+    displayName = "${property("mod_version")} for ${sc.current.version}"
+    version = property("mod_version") as String
+    changelog = rootProject.file("CHANGELOG.md").readText()
+    type = STABLE
+    modLoaders.add("fabric")
 
-    versionNumber = version.toString()
-    versionType = "release" // `release`, `beta` or `alpha`
+    dryRun = providers.environmentVariable("MODRINTH_TOKEN").getOrNull() == null
 
-    (project.property("minecraft_publish") as String)
-        .split(" ")
-        .forEach(gameVersions::add)
-
-    uploadFile.set(modJar)
-    loaders.add("fabric")
-
-    dependencies { // A special DSL for creating dependencies
-        // scope.type
-        // The scope can be `required`, `optional`, `incompatible`, or `embedded`
-        // The type can either be `project` or `version`
-        required.project("fabric-api") // Creates a new required dependency on Fabric API
-        required.project("fabric-language-kotlin")
+    modrinth {
+        projectId = "JAYD9vCA"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.addAll(property("minecraft_publish").toString().split(' '))
+        requires {
+            slug = "fabric-api"
+        }
+        requires {
+            slug = "fabric-language-kotlin"
+        }
     }
 }
