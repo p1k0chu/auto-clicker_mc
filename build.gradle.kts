@@ -106,7 +106,7 @@ publishMods {
     file = modJar.flatMap { it.archiveFile }
     displayName = "${property("mod_version")} for ${sc.current.version}"
     version = property("mod_version") as String
-    changelog = rootProject.file("CHANGELOG.md").readText()
+    changelog = file("CHANGELOG.md").readText()
     type = STABLE
     modLoaders.add("fabric")
 
