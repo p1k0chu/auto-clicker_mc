@@ -46,8 +46,8 @@ object AutoClicker : ClientModInitializer {
     init {
         val keyMappingCategory = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, MOD_ID))
 
-        openConfig = KeyMapping(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_O, keyMappingCategory)
-        toggleFunction = KeyMapping(Language.TOGGLE.key, GLFW.GLFW_KEY_I, keyMappingCategory)
+        openConfig = KeyMapping(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_UNKNOWN, keyMappingCategory)
+        toggleFunction = KeyMapping(Language.TOGGLE.key, GLFW.GLFW_KEY_UNKNOWN, keyMappingCategory)
     }
 
     val config: Config = loadConfig()
