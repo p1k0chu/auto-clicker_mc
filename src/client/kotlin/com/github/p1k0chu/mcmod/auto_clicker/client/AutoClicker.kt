@@ -129,7 +129,12 @@ object AutoClicker : ClientModInitializer {
     private fun clientTick(mc: Minecraft) {
         if (mc.isPaused) return
 
-        if ((config.allowedInMenus || mc.screen == null) && active) {
+        //? >=26.2 {
+        /*val screen = mc.gui.screen()
+        *///? } else
+        val screen = mc.screen
+
+        if ((config.allowedInMenus || screen == null) && active) {
             if (mc.player?.isDeadOrDying == true) {
                 if (config.deactivateOnDeath) {
                     active = false
@@ -147,6 +152,9 @@ object AutoClicker : ClientModInitializer {
         }
         while (openConfig.consumeClick()) {
             active = false
+            //? >=26.2 {
+            /*mc.gui.setScreen(OptionsScreen())
+            *///? } else
             mc.setScreen(OptionsScreen())
         }
     }
