@@ -1,25 +1,27 @@
 package com.github.p1k0chu.mcmod.auto_clicker.client
 
 import com.google.gson.Gson
+import com.mojang.blaze3d.platform.InputConstants
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.client.DeltaTracker
+import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.KeyMapping
-import net.minecraft.client.DeltaTracker
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ShieldItem
-import net.minecraft.world.InteractionResult
 import net.minecraft.util.CommonColors
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ShieldItem
+import net.minecraft.world.item.component.SwingAnimation
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
-import org.lwjgl.glfw.GLFW
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -46,8 +48,8 @@ object AutoClicker : ClientModInitializer {
     init {
         val keyMappingCategory = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, MOD_ID))
 
-        openConfig = KeyMapping(Language.OPEN_SETTINGS.key, GLFW.GLFW_KEY_UNKNOWN, keyMappingCategory)
-        toggleFunction = KeyMapping(Language.TOGGLE.key, GLFW.GLFW_KEY_UNKNOWN, keyMappingCategory)
+        openConfig = KeyMapping(Language.OPEN_SETTINGS.key, InputConstants.UNKNOWN.value, keyMappingCategory)
+        toggleFunction = KeyMapping(Language.TOGGLE.key, InputConstants.UNKNOWN.value, keyMappingCategory)
     }
 
     val config: Config = loadConfig()
@@ -130,9 +132,9 @@ object AutoClicker : ClientModInitializer {
         if (mc.isPaused) return
 
         //? >=26.2 {
-        /*val screen = mc.gui.screen()
-        *///? } else
-        val screen = mc.screen
+        val screen = mc.gui.screen()
+        //? } else
+        //val screen = mc.screen
 
         if ((config.allowedInMenus || screen == null) && active) {
             if (mc.player?.isDeadOrDying == true) {
@@ -153,9 +155,9 @@ object AutoClicker : ClientModInitializer {
         while (openConfig.consumeClick()) {
             active = false
             //? >=26.2 {
-            /*mc.gui.setScreen(OptionsScreen())
-            *///? } else
-            mc.setScreen(OptionsScreen())
+            mc.gui.setScreen(OptionsScreen())
+            //? } else
+            //mc.setScreen(OptionsScreen())
         }
     }
 
@@ -207,7 +209,7 @@ object AutoClicker : ClientModInitializer {
             trace.entity
         )
         // cosmetic
-        player.swing(InteractionHand.MAIN_HAND)
+        swing(player, InteractionHand.MAIN_HAND)
 
         // stop using item when you attack entities
         client.gameMode?.releaseUsingItem(player)
@@ -235,7 +237,7 @@ object AutoClicker : ClientModInitializer {
             )
             if(result is InteractionResult.Success) {
                 if(result.swingSource != InteractionResult.SwingSource.NONE) {
-                    player.swing(hand)
+                    swing(player, hand)
                 }
 
                 // reset the timeout
@@ -286,7 +288,7 @@ object AutoClicker : ClientModInitializer {
             )
             if(result is InteractionResult.Success) {
                 if(result.swingSource != InteractionResult.SwingSource.NONE) {
-                    player.swing(hand)
+                    swing(player, hand)
                 }
                 // reset the timeout
                 holding.timeout = config.cooldown
@@ -307,7 +309,7 @@ object AutoClicker : ClientModInitializer {
 
             if(result is InteractionResult.Success) {
                 if(result.swingSource != InteractionResult.SwingSource.NONE) {
-                    player.swing(hand)
+                    swing(player, hand)
                 }
 
                 holding.timeout = holding.config.cooldown
@@ -361,5 +363,12 @@ object AutoClicker : ClientModInitializer {
         }
 
         return client.player?.useItem?.item is ShieldItem
+    }
+
+    private fun swing(player: Player, hand: InteractionHand) {
+        //? >=26.3 {
+        player.swing(hand, SwingAnimation.DEFAULT, true)
+        //? } else
+        //player.swing(hand)
     }
 }
